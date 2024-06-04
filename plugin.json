@@ -1,8 +1,8 @@
 {
-  "name": "sample-plugin",
+  "name": "debug-stats",
   "version": "1.0.0",
-  "mode": "development",
-  "color": "blue",
+  "mode": "production",
+  "color": "red",
   "entry": "dist/index.js",
   "node": true,
   "typescript": true
