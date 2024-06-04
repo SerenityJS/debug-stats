@@ -31,7 +31,7 @@ export class DebugStatsComponent extends PlayerComponent {
 	/**
 	 * The bossbar that will be displayed to the player
 	*/
-	public readonly bossbar = new Bossbar(this.player, this.player.type.identifier, 1, BossEventColor.Purple);
+	public readonly bossbar = new Bossbar(this.player, this.player.type.identifier, 1, BossEventColor.Red);
 
 	/**
 	 * Whether the bossbar is visible or not
