@@ -4,7 +4,6 @@ import type { Plugin } from "@serenityjs/plugins";
 import { Player, PlayerComponent } from "@serenityjs/world";
 import { Bossbar } from "@serenityjs/server-ui"
 import { BossEventColor } from "@serenityjs/protocol";
-import { EntityIdentifier, EntityType } from "@serenityjs/entity";
 
 export class DebugStatsComponent extends PlayerComponent {
 	public static readonly identifier = "serenity:debug_stats";
