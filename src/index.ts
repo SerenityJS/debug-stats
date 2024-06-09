@@ -6,27 +6,10 @@ import { Bossbar } from "@serenityjs/server-ui"
 import { BossEventColor } from "@serenityjs/protocol";
 import { EntityIdentifier, EntityType } from "@serenityjs/entity";
 
-// Declare the serenity instance
-let serenity: Serenity;
-
-/**
- * Fired when the plugin is started
- * @param serenity The serenity instance of the server
- * @param data The data of the plugin, such as the logger and config
- */
-export function onStartup(api: Serenity, data: Plugin): void {
-	// Get the logger of the plugin
-	const { logger } = data;
-
-	// Log that the plugin has been started
-	logger.info("Plugin has been started!");
-
-	// Set the serenity instance
-	serenity = api;
-}
-
 export class DebugStatsComponent extends PlayerComponent {
 	public static readonly identifier = "serenity:debug_stats";
+
+	protected readonly serenity: Serenity;
 
 	/**
 	 * The bossbar that will be displayed to the player
@@ -42,8 +25,9 @@ export class DebugStatsComponent extends PlayerComponent {
 	 * Create a new instance of the DebugStatsComponent
 	 * @param player The player that the component is attached to
 	 */
-	public constructor(player: Player) {
+	public constructor(player: Player, serenity: Serenity) {
 		super(player, DebugStatsComponent.identifier);
+		this.serenity = serenity;
 	}
 
 	public onTick(): void {
@@ -52,7 +36,7 @@ export class DebugStatsComponent extends PlayerComponent {
 
 		// Update the bossbar information
 		const ping = this.player.ping;
-		const tps = serenity?.tps ?? 0;
+		const tps = this.serenity?.tps ?? 0;
 		const memory = process.memoryUsage().heapUsed / 1024 / 1024;
 		const entities = this.player.dimension.entities.size;
 		const chunks = this.player.getComponent("minecraft:chunk_rendering").chunks.size;
@@ -62,6 +46,19 @@ export class DebugStatsComponent extends PlayerComponent {
 	}
 }
 
-// Register the component to the player type
-const playerType = EntityType.get(EntityIdentifier.Player) as EntityType;
-DebugStatsComponent.register(playerType);
+/**
+ * Fired when the plugin is started
+ * @param serenity The serenity instance of the server
+ * @param data The data of the plugin, such as the logger and config
+ */
+export function onStartup(serenity: Serenity, data: Plugin): void {
+	// Get the logger of the plugin
+	const { logger } = data;
+
+	// Log that the plugin has been started
+	logger.info("Plugin has been started!");
+
+	serenity.on("PlayerSpawned", (event) => {
+		new DebugStatsComponent(event.player, serenity);
+	})
+}
