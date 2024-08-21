@@ -1,7 +1,7 @@
 import type { Serenity } from "@serenityjs/serenity";
 import type { Plugin } from "@serenityjs/plugins";
 
-import { Player, PlayerComponent } from "@serenityjs/world";
+import { Player, PlayerComponent, WorldEvent, WorldEvents } from "@serenityjs/world";
 import { Bossbar } from "@serenityjs/server-ui"
 import { BossEventColor } from "@serenityjs/protocol";
 
@@ -57,7 +57,8 @@ export function onStartup(serenity: Serenity, data: Plugin): void {
 	// Log that the plugin has been started
 	logger.info("Plugin has been started!");
 
-	serenity.on("PlayerSpawned", (event) => {
+	// Listen for when a player joins the server
+	WorldEvents.on(WorldEvent.PlayerJoin, (event) => {
 		new DebugStatsComponent(event.player, serenity);
 	})
 }
