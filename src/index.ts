@@ -1,7 +1,7 @@
 import type { Serenity } from "@serenityjs/serenity";
 import type { Plugin } from "@serenityjs/plugins";
 
-import { CardinalDirection, Player, PlayerComponent, WorldEvent, Worlds } from "@serenityjs/world";
+import { CardinalDirection, Player, PlayerComponent, WorldEvent } from "@serenityjs/world";
 import { Bossbar } from "@serenityjs/server-ui"
 import { BossEventColor } from "@serenityjs/protocol";
 export class DebugStatsComponent extends PlayerComponent {
