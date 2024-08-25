@@ -1,10 +1,9 @@
 import type { Serenity } from "@serenityjs/serenity";
 import type { Plugin } from "@serenityjs/plugins";
 
-import { Player, PlayerComponent, WorldEvent, WorldEvents } from "@serenityjs/world";
+import { CardinalDirection, Player, PlayerComponent, WorldEvent, Worlds } from "@serenityjs/world";
 import { Bossbar } from "@serenityjs/server-ui"
 import { BossEventColor } from "@serenityjs/protocol";
-
 export class DebugStatsComponent extends PlayerComponent {
 	public static readonly identifier = "serenity:debug_stats";
 
@@ -34,14 +33,14 @@ export class DebugStatsComponent extends PlayerComponent {
 		if (!this.visible) this.bossbar.show(this.player);
 
 		// Update the bossbar information
-		const ping = this.player.ping;
+		const direction = CardinalDirection[this.player.getCardinalDirection()];
 		const tps = this.serenity?.tps ?? 0;
 		const memory = process.memoryUsage().heapUsed / 1024 / 1024;
 		const entities = this.player.dimension.entities.size;
 		const chunks = this.player.getComponent("minecraft:chunk_rendering").chunks.size;
 		
 		// Set the title of the bossbar
-		this.bossbar.setTitle(`Ping: ${ping}ms | TPS: ${tps} | Memory: ${memory.toFixed(2)}MB | Entities: ${entities} | Chunks: ${chunks}`);
+		this.bossbar.setTitle(`Direction: ${direction} | TPS: ${tps} | Memory: ${memory.toFixed(2)}MB | Entities: ${entities} | Chunks: ${chunks}`);
 	}
 }
 
@@ -58,7 +57,7 @@ export function onStartup(serenity: Serenity, data: Plugin): void {
 	logger.info("Plugin has been started!");
 
 	// Listen for when a player joins the server
-	WorldEvents.on(WorldEvent.PlayerJoin, (event) => {
+	serenity.worlds.on(WorldEvent.PlayerJoin, (event) => {
 		new DebugStatsComponent(event.player, serenity);
 	})
 }
