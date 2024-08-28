@@ -1,9 +1,0 @@
-{
-  "name": "debug-stats",
-  "version": "1.0.0",
-  "mode": "production",
-  "color": "red",
-  "entry": "dist/index.js",
-  "node": true,
-  "typescript": true
-}

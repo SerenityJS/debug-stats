@@ -4,6 +4,7 @@ import type { Plugin } from "@serenityjs/plugins";
 import { CardinalDirection, Player, PlayerComponent, WorldEvent } from "@serenityjs/world";
 import { Bossbar } from "@serenityjs/server-ui"
 import { BossEventColor } from "@serenityjs/protocol";
+
 export class DebugStatsComponent extends PlayerComponent {
 	public static readonly identifier = "serenity:debug_stats";
 
