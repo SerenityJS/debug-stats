@@ -1,64 +1,49 @@
-import type { Serenity } from "@serenityjs/serenity";
-import type { Plugin } from "@serenityjs/plugins";
+import { Plugin, PluginEvents, PluginType } from "@serenityjs/plugins";
 
-import { CardinalDirection, Player, PlayerComponent, WorldEvent } from "@serenityjs/world";
-import { Bossbar } from "@serenityjs/server-ui"
+import { Bossbar, CardinalDirection, EntityIdentifier, Player, PlayerChunkRenderingTrait, PlayerTrait, WorldInitializeSignal } from "@serenityjs/core";
 import { BossEventColor } from "@serenityjs/protocol";
 
-export class DebugStatsComponent extends PlayerComponent {
-	public static readonly identifier = "serenity:debug_stats";
-
-	protected readonly serenity: Serenity;
+export class DebugStatsTrait extends PlayerTrait {
+	public static readonly identifier = "debug_stats";
+	public static readonly types = [EntityIdentifier.Player];
 
 	/**
 	 * The bossbar that will be displayed to the player
 	*/
 	public readonly bossbar = new Bossbar(this.player, this.player.type.identifier, 1, BossEventColor.Red);
 
-	/**
-	 * Whether the bossbar is visible or not
-	*/
-	protected visible = false;
-
-	/**
-	 * Create a new instance of the DebugStatsComponent
-	 * @param player The player that the component is attached to
-	 */
-	public constructor(player: Player, serenity: Serenity) {
-		super(player, DebugStatsComponent.identifier);
-		this.serenity = serenity;
+	public onSpawn(): void {
+		// Show the bossbar to the player
+		this.bossbar.show(this.player);
 	}
 
 	public onTick(): void {
-		// Show the bossbar if it is not visible
-		if (!this.visible) this.bossbar.show(this.player);
-
 		// Update the bossbar information
 		const direction = CardinalDirection[this.player.getCardinalDirection()];
-		const tps = this.serenity?.tps ?? 0;
+		const tps = this.entity.world.serenity?.tps ?? 0;
 		const memory = process.memoryUsage().heapUsed / 1024 / 1024;
 		const entities = this.player.dimension.entities.size;
-		const chunks = this.player.getComponent("minecraft:chunk_rendering").chunks.size;
+		const chunks = this.player.getTrait(PlayerChunkRenderingTrait).chunks.size;
 		
 		// Set the title of the bossbar
 		this.bossbar.setTitle(`Direction: ${direction} | TPS: ${tps} | Memory: ${memory.toFixed(2)}MB | Entities: ${entities} | Chunks: ${chunks}`);
 	}
 }
 
-/**
- * Fired when the plugin is started
- * @param serenity The serenity instance of the server
- * @param data The data of the plugin, such as the logger and config
- */
-export function onStartup(serenity: Serenity, data: Plugin): void {
-	// Get the logger of the plugin
-	const { logger } = data;
+class DebugStatsPlugin extends Plugin implements PluginEvents {
+	public readonly type = PluginType.Addon;
 
-	// Log that the plugin has been started
-	logger.info("Plugin has been started!");
+	public constructor() {
+		super("DebugStats", "1.0.0");
+	}
 
-	// Listen for when a player joins the server
-	serenity.worlds.on(WorldEvent.PlayerJoin, (event) => {
-		new DebugStatsComponent(event.player, serenity);
-	})
+	public onWorldInitialize(event: WorldInitializeSignal): void {
+		// Register the trait to the entity palette
+		event.world.entityPalette.registerTrait(DebugStatsTrait);
+
+		// Log that the trait has been registered
+		this.logger.info("Registered DebugStatsTrait to the entity palette");
+	}
 }
+
+export default new DebugStatsPlugin();
